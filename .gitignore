@@ -1,2 +1,3 @@
 forDEV.txt
 venv/
+__pycache__/

@@ -18,7 +18,16 @@ class Person:
         return
 
     def get_color(self) -> tuple: # from status return the color of cell
-        pass
+        if self.status == "healty":
+            return (0, 255, 0) # green
+        elif self.status == "sick":
+            return (255, 0, 0) # red
+        elif self.status == "carrier":
+            return (255, 255, 0) # yellow
+        elif self.status == "vaccinated":
+            return (0, 0, 255) # blue
+        else:
+            raise ValueError("invalid status")
 
     def calculate_change(self) -> None: # it change the type of person based on probability
         pass
