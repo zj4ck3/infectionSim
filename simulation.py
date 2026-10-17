@@ -12,8 +12,26 @@ class Simulation:
         return
     
     def init_grid(self) -> None: # for random population based on constant
-        pass
+        print("\n[#] Info configuration:")
+        self.diseaseConstants = {"density": 0.0, "gathering": 0.0, "healthy": 0.0, "vaccinated": 0.0, "carrier": 0.0, "sick": 0.0, "mortality":0.0}
+        self.diseaseConstants["density"] = round(int(input("[1/7 - ?] Insert your population density (0 - 100): "))/100,2)
+        self.diseaseConstants["gathering"] = round(int(input("[2/7 - ?] Insert your gathering density (0-100): "))/100,2)
+        self.diseaseConstants["healthy"] = round(int(input("[3/7 - ?] Insert your healthy people density (0-100): "))/100,2)
+        self.diseaseConstants["vaccinated"] = round(int(input("[4/7 - ?] Insert your vaccinated people density (0-100): "))/100,2)
+        self.diseaseConstants["carrier"] = round(int(input("[5/7 - ?] Insert your carrier people density (0-100): "))/100,2)
+        self.diseaseConstants["sick"] = round(int(input("[6/7 - ?] Insert your sick people density (0-100): "))/100,2)
+        self.diseaseConstants["mortality"] = round(int(input("[7/7 - ?] Insert your mortality rate (0-100): "))/100,2)
 
+        control = list(self.diseaseConstants.values())
+        for value in control:
+            if value < 0 or value > 1:
+                raise ValueError("[X] All values must be between 0 and 100.")
+        if sum(control[2:5]) > 1:
+            raise ValueError("[X] The sum of all values must not exceed 100.")
+        
+        print("[V] Configuration completed correctly")
+        print("[#] Initializing grid...")
+        return
 
     def draw(self) -> None:
         screen_width, screen_height = self.screen.get_size()
