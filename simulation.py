@@ -1,17 +1,18 @@
 from person import Person
 import pygame
+import random
 import numpy
 
 class Simulation:
     def __init__(self, SHAPE:tuple) -> None:
         self.SHAPE = self.WIDTH, self.HEIGHT = SHAPE
-        self.matrix = numpy.zeros(self.SHAPE)
+        self.matrix = numpy.full(self.SHAPE, None, dtype=object) # full the matrix with None
         
         self.WINDOW_SIZE = (1200, 800) # width, height
         self.BLACK = (0, 0, 0)
         return
 
-    def prompt_percentage(self, label: str) -> float: # for user handling in init_grid
+    def prompt_percentage(self, label: str) -> float: # for user handling in ask_pre_info
         while True:
             answer = input(f"[?] {label} (0-100%): ")
             try:
@@ -24,27 +25,75 @@ class Simulation:
                 return percentage / 100
             print("[X] Please enter a value from 0 to 100.\n")
     
-    def init_grid(self) -> None: # for random population based on constant
+    def ask_pre_info(self) -> None: # ask user before start some variables
         print("\n[#] Info configuration:")
-        self.diseaseConstants = {"density": 0.0, "gathering": 0.0, "healthy": 0.0, "vaccinated": 0.0, "carrier": 0.0, "sick": 0.0, "mortality":0.0}
+        self.diseaseConstants = {"density": 0.0, "healthy": 0.0, "vaccinated": 0.0, "carrier": 0.0, "sick": 0.0, "mortality":0.0}
         self.diseaseConstants["density"] = self.prompt_percentage("Population density")
-        self.diseaseConstants["gathering"] = self.prompt_percentage("Gathering density")
 
         while True:
             self.diseaseConstants["healthy"] = self.prompt_percentage("Healthy people")
             self.diseaseConstants["vaccinated"] = self.prompt_percentage("Vaccinated people")
             self.diseaseConstants["carrier"] = self.prompt_percentage("Carrier people")
-            status_total = sum(list(self.diseaseConstants.values())[2:5])
+            self.diseaseConstants["sick"] = self.prompt_percentage("Sick people")
+            status_total = sum(list(self.diseaseConstants.values())[1:5])
 
             if status_total == 1:
                 break
             print("[X] Those percentages together don't make 100%. Please enter them again.\n")
 
-        self.diseaseConstants["sick"] = self.prompt_percentage("Sick people")
-        self.diseaseConstants["mortality"] = self.prompt_percentage("Mortality rate")
-        
+        self.diseaseConstants["mortality"] = self.prompt_percentage("Mortality rate")        
         print("\n[V] Configuration completed correctly")
         print("[#] Initializing grid...")
+        return
+
+    def init__grid(self) -> None:
+        # Total population based on density
+        population = round(self.SHAPE[0] * self.SHAPE[1] * self.diseaseConstants["density"])
+        statuses = ["healthy", "vaccinated", "carrier", "sick"]
+        proportions = [self.diseaseConstants[s] for s in statuses]
+
+        # Calculate the initial counts
+        raw_counts = [population * p for p in proportions]
+        counts_list = [int(n) for n in raw_counts]
+
+        # Calculate how many people are missing
+        # ES: 3,9 and 2.1 = 3,1 but 1 person is missing
+        remaining = population - sum(counts_list)
+
+        # Store each index with its decimal remainder
+        # this is for redistribute the missing people based on largest decimal
+        remainders = []
+        for i in range(len(statuses)):
+            remainder = raw_counts[i] - counts_list[i]
+            remainders.append((i, remainder))
+
+        # Sort from the largest remainder to the smallest
+        remainders.sort(key=lambda item: item[1], reverse=True)
+
+        # Distribute the missing people
+        for i in range(remaining):
+            index = remainders[i][0]
+            counts_list[index] += 1
+
+        counts = dict(zip(statuses, counts_list))
+        # Generate all possible positions and shuffle them
+        positions = [
+            (x, y)
+            for x in range(self.SHAPE[0])
+            for y in range(self.SHAPE[1])
+        ]
+        random.shuffle(positions)
+
+        # Assign people to random positions
+        for i in range(population):
+            while True:
+                choice = random.choice(statuses)
+
+                if counts[choice] > 0:
+                    counts[choice] -= 1
+                    break
+
+            self.matrix[positions[i]] = Person(choice)
         return
 
     def draw(self) -> None:
