@@ -10,6 +10,7 @@ class Simulation:
         
         self.WINDOW_SIZE = (1200, 800) # width, height
         self.BLACK = (0, 0, 0)
+        self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         return
 
     def prompt_percentage(self, label: str) -> float: # for user handling in ask_pre_info
@@ -132,7 +133,7 @@ class Simulation:
                 if person is None or person == 0:
                     cell_color = self.BLACK
                 else:
-                    cell_color = person.get_color()
+                    cell_color = person.color
 
                 pygame.draw.rect(self.screen, cell_color, cell)
 
@@ -158,8 +159,25 @@ class Simulation:
                 (round(offset_x + grid_width), y),        1
             )
 
+    def score_neighbours(self) -> tuple: # count the number of positive and negative neighbours
+        return (0,0)
+
     def update(self) -> None: # update the matrix
-        pass
+        positive, negative = self.score_neighbours()
+
+        for row in range(self.SHAPE[0]):
+            for column in range(self.SHAPE[1]):
+                person = self.matrix[row,column]
+
+                if person is not None:
+                    new_type = person.calculate_change()
+
+                    if new_type != person.status:
+                        if new_type is not None:
+                            self.matrix[row,column] = Person(new_type)
+                        else:
+                            self.matrix[row,column] = None
+        return
 
     def run(self) -> None:
         pygame.init()

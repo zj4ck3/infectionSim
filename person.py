@@ -3,7 +3,7 @@ class Person:
         self.status = status
 
         # to complete, non only with id
-        if status == "healty":
+        if status == "healthy":
             self.id = 1
             self.color = (0, 255, 0) # green
         elif status == "sick":
@@ -21,5 +21,5 @@ class Person:
             raise ValueError("invalid status")
         return
 
-    def calculate_change(self) -> None: # it change the type of person based on probability
-        pass
+    def calculate_change(self) -> str: # it change the type of person based on probability
+        return self.status
