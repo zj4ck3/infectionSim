@@ -10,26 +10,40 @@ class Simulation:
         self.WINDOW_SIZE = (1200, 800) # width, height
         self.BLACK = (0, 0, 0)
         return
+
+    def prompt_percentage(self, label: str) -> float: # for user handling in init_grid
+        while True:
+            answer = input(f"[?] {label} (0-100%): ")
+            try:
+                percentage = int(answer)
+            except ValueError:
+                print("[X] Please enter a whole number from 0 to 100.\n")
+                continue
+
+            if 0 <= percentage <= 100:
+                return percentage / 100
+            print("[X] Please enter a value from 0 to 100.\n")
     
     def init_grid(self) -> None: # for random population based on constant
         print("\n[#] Info configuration:")
         self.diseaseConstants = {"density": 0.0, "gathering": 0.0, "healthy": 0.0, "vaccinated": 0.0, "carrier": 0.0, "sick": 0.0, "mortality":0.0}
-        self.diseaseConstants["density"] = round(int(input("[1/7 - ?] Insert your population density (0 - 100): "))/100,2)
-        self.diseaseConstants["gathering"] = round(int(input("[2/7 - ?] Insert your gathering density (0-100): "))/100,2)
-        self.diseaseConstants["healthy"] = round(int(input("[3/7 - ?] Insert your healthy people density (0-100): "))/100,2)
-        self.diseaseConstants["vaccinated"] = round(int(input("[4/7 - ?] Insert your vaccinated people density (0-100): "))/100,2)
-        self.diseaseConstants["carrier"] = round(int(input("[5/7 - ?] Insert your carrier people density (0-100): "))/100,2)
-        self.diseaseConstants["sick"] = round(int(input("[6/7 - ?] Insert your sick people density (0-100): "))/100,2)
-        self.diseaseConstants["mortality"] = round(int(input("[7/7 - ?] Insert your mortality rate (0-100): "))/100,2)
+        self.diseaseConstants["density"] = self.prompt_percentage("Population density")
+        self.diseaseConstants["gathering"] = self.prompt_percentage("Gathering density")
 
-        control = list(self.diseaseConstants.values())
-        for value in control:
-            if value < 0 or value > 1:
-                raise ValueError("[X] All values must be between 0 and 100.")
-        if sum(control[2:5]) > 1:
-            raise ValueError("[X] The sum of all values must not exceed 100.")
+        while True:
+            self.diseaseConstants["healthy"] = self.prompt_percentage("Healthy people")
+            self.diseaseConstants["vaccinated"] = self.prompt_percentage("Vaccinated people")
+            self.diseaseConstants["carrier"] = self.prompt_percentage("Carrier people")
+            status_total = sum(list(self.diseaseConstants.values())[2:5])
+
+            if status_total == 1:
+                break
+            print("[X] Those percentages together don't make 100%. Please enter them again.\n")
+
+        self.diseaseConstants["sick"] = self.prompt_percentage("Sick people")
+        self.diseaseConstants["mortality"] = self.prompt_percentage("Mortality rate")
         
-        print("[V] Configuration completed correctly")
+        print("\n[V] Configuration completed correctly")
         print("[#] Initializing grid...")
         return
 
@@ -98,7 +112,7 @@ class Simulation:
     def update(self) -> None: # update the matrix
         pass
 
-    def run(self) -> None: # run the app
+    def run(self) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE, pygame.RESIZABLE)
         pygame.display.set_caption("Infection simulation")
