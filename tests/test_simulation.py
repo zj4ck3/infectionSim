@@ -47,7 +47,7 @@ class Simulation:
         print("[#] Initializing grid...")
         return
 
-    def init__grid(self) -> None:
+    def init__grid(self) -> None: # initialize the grid with people based on the density and proportions
         # Total population based on density
         population = round(self.SHAPE[0] * self.SHAPE[1] * self.diseaseConstants["density"])
         statuses = ["healthy", "vaccinated", "carrier", "sick"]
@@ -159,14 +159,14 @@ class Simulation:
                 (round(offset_x + grid_width), y),        1
             )
 
-    def score_neighbours(self) -> tuple: # count the number of positive and negative neighbours
+    def score_neighbours(self, row: int, column: int) -> tuple: # count the number of positive and negative neighbours for update
         return (0,0)
 
     def update(self) -> None: # update the matrix
-        positive, negative = self.score_neighbours()
-
         for row in range(self.SHAPE[0]):
             for column in range(self.SHAPE[1]):
+
+                positive, negative = self.score_neighbours(row,column)
                 person = self.matrix[row,column]
 
                 if person is not None:
@@ -203,6 +203,8 @@ class Simulation:
             pygame.display.flip()
             self.clock.tick(5)
 
+            if not paused:
+                self.update()
         pygame.quit()
 
     def info(self) -> None: # display information

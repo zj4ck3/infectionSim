@@ -5,7 +5,7 @@ class Person:
         # to complete, non only with id
         if status == "healthy":
             self.id = 1
-            self.color = (0, 255, 0) # green
+            self.color = (0, 0, 255) # blue
         elif status == "sick":
             self.id = 2
             self.days = 0 # days of sickness
@@ -16,7 +16,7 @@ class Person:
             self.color = (255, 255, 0) # yellow
         elif status == "vaccinated":
             self.id = 4
-            self.color = (0, 0, 255) # blue
+            self.color = (0, 255, 0) # green
         else:
             raise ValueError("invalid status")
         return
