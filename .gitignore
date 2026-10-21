@@ -1,26 +1,25 @@
-# Python: cache e eventuali file di compilazione tipo .pyd
+# Python: cache and compilation file like .pyd
 __pycache__/ 
 *.py[cod]
 
-# Ambienti virtuali
+# virtual environment
 .venv/
 venv/
 
-# Test e coverage
+# Test and coverage
 .pytest_cache/
 
-# Packaging e installazione
+# Packaging and installation
 *.egg-info/
 build/
 dist/
 
-# IDE ed editor
+# IDE and editor
 .vscode/
-
-# File temporanei
+# temp file
 *.tmp
 *.swp
 *~
 
-# File locali per sviluppatori
+# local File for DEV
 forDEV.txt
