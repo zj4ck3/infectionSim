@@ -25,6 +25,7 @@ class Simulation:
             if 0 <= percentage <= 100:
                 return percentage / 100
             print("[X] Please enter a value from 0 to 100.\n")
+        return
     
     def ask_pre_info(self) -> None: # ask user before start some variables
         print("\n[#] Info configuration:")
@@ -158,6 +159,7 @@ class Simulation:
                 (round(offset_x), y),
                 (round(offset_x + grid_width), y),        1
             )
+        return
 
     def score_neighbours(self, row: int, column: int) -> tuple: # count the number of positive and negative neighbours for update
         return (0,0)
