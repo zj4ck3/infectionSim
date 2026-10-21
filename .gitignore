@@ -1,6 +1,26 @@
-forDEV.txt
+# Python: cache e eventuali file di compilazione tipo .pyd
+__pycache__/ 
+*.py[cod]
+
+# Ambienti virtuali
 .venv/
-__pycache__/
-/src/__pycache__/
-/tests/__pycache__/
-/tests/.pytest_cache/
+venv/
+
+# Test e coverage
+.pytest_cache/
+
+# Packaging e installazione
+*.egg-info/
+build/
+dist/
+
+# IDE ed editor
+.vscode/
+
+# File temporanei
+*.tmp
+*.swp
+*~
+
+# File locali per sviluppatori
+forDEV.txt

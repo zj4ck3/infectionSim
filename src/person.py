@@ -1,20 +1,25 @@
 class Person:
     def __init__(self, status:str) -> None:
-        self.status = status
+        self.change_status(status)
+        return
 
-        # to complete, non only with id
+    def change_status(self, status: str):
         if status == "healthy":
+            self.status = status
             self.id = 1
             self.color = (0, 0, 255) # blue
         elif status == "sick":
+            self.status = status
             self.id = 2
             self.days = 0 # days of sickness
             self.color = (255, 0, 0) # red
         elif status == "carrier":
+            self.status = status
             self.id = 3
             self.days = 0 # days of carrier
             self.color = (255, 255, 0) # yellow
         elif status == "vaccinated":
+            self.status = status
             self.id = 4
             self.color = (0, 255, 0) # green
         else:
