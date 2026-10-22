@@ -161,8 +161,24 @@ class Simulation:
             )
         return
 
-    def score_neighbours(self, row: int, column: int) -> tuple: # count the number of positive and negative neighbours for update
-        return (0,0)
+    def score_neighbours(self, row: int, column: int) -> dict:
+        near_cell = {"transmissible": 0, "untransmissible": 0}
+
+        for di, dj in self.neighbour:
+            ni = row + di
+            nj = column + dj
+
+            # Check that the neighbour is inside the matrix
+            if 0 <= ni < self.SHAPE[0] and 0 <= nj < self.SHAPE[1]:
+                person = self.matrix[ni, nj]
+
+                if person is None:
+                    near_cell["untransmissible"] += 1
+                elif person.status in ["susceptible", "recovered", "dead", "immune"]:
+                    near_cell["untransmissible"] += 1
+                else:
+                    near_cell["transmissible"] += 1
+        return near_cell
 
     def update(self) -> None: # update the matrix
         inter_matrix = self.matrix.copy()
@@ -170,11 +186,11 @@ class Simulation:
         for row in range(self.SHAPE[0]):
             for column in range(self.SHAPE[1]):
 
-                positive, negative = self.score_neighbours(row,column)
+                near_cell = self.score_neighbours(row,column)
                 person = self.matrix[row,column]
 
                 if person is not None:
-                    new_type = person.calculate_change()
+                    new_type = person.calculate_change(near_cell, self.diseaseConstants["mortality"])
 
                     if new_type != person.status:
                         if new_type is not None:
@@ -206,7 +222,7 @@ class Simulation:
             self.screen.fill(self.BLACK)
             self.draw()
             pygame.display.flip()
-            self.clock.tick(30)
+            self.clock.tick(3)
 
             if not paused:
                 self.update()

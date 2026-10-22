@@ -1,3 +1,8 @@
+from random import random
+P_TRASMISSION = 0.08 # probability that only 1 infected infect a susceptible
+P_CARRIER = 0.6 # Probability that a susceptible enters in carrier status and not infected
+P_HEALTYFROMCARRIER = 0.1
+
 class Person:
     def __init__(self, status:str) -> None:
         self.change_status(status)
@@ -34,5 +39,57 @@ class Person:
             raise ValueError("invalid status")
         return
 
-    def calculate_change(self) -> str: # it change the type of person based on probability
-        return self.status
+    def calculate_change(self, neighbour:dict, mortality:float) -> str: # it change the type of person based on probability
+        # if a person is dead, there isn't any change possible
+        if self.status == "dead":
+            return self.status
+        
+        # if a person is recovered, is immune for a bit of time, then it become again susceptible
+        elif self.status == "recovered":
+            if self.days_in_state >= 15:
+                return "susceptible"
+            else:
+                self.days_in_state += 1
+            return self.status
+
+        # if a person is infected, after a bit of time can become dead or recovered with a probability
+        elif self.status == "infected":
+            if self.days_in_state >= 7: 
+                if random() > mortality:
+                    return "recovered"
+                else:
+                    return "dead"
+            else:
+                self.days_in_state += 1
+                return self.status
+
+        # if a person is immune, the status doesen't change for a bit of time
+        elif self.status == "immune":
+            if self.days_in_state >= 13:
+                return "susceptible"
+            else:
+                self.days_in_state += 1
+                return self.status
+
+        # if a person is carrier after a bit of time can be recovered or infected
+        elif self.status == "carrier":
+            if self.days_in_state >= 3:
+                if random() < P_HEALTYFROMCARRIER:
+                    return "recovered"
+                else:
+                    return "infected"
+            else:
+                self.days_in_state += 1
+                return self.status
+        
+        # if a person is susceptible with a probability based on neighbour can become infected or carrier or susceptible again
+        else:
+            P_infect = 1-((1-P_TRASMISSION)**neighbour["transmissible"])
+
+            if random() < P_infect:
+                if random() < P_CARRIER:
+                    return "infected"
+                else:
+                    return "carrier"
+            else:
+                return self.status
