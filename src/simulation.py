@@ -29,14 +29,14 @@ class Simulation:
     
     def ask_pre_info(self) -> None: # ask user before start some variables
         print("\n[#] Info configuration:")
-        self.diseaseConstants = {"density": 0.0, "healthy": 0.0, "vaccinated": 0.0, "carrier": 0.0, "sick": 0.0, "mortality":0.0}
+        self.diseaseConstants = {"density": 0.0, "susceptible": 0.0, "immune": 0.0, "carrier": 0.0, "infected": 0.0, "mortality":0.0}
         self.diseaseConstants["density"] = self.prompt_percentage("Population density")
 
         while True:
-            self.diseaseConstants["healthy"] = self.prompt_percentage("Healthy people")
-            self.diseaseConstants["vaccinated"] = self.prompt_percentage("Vaccinated people")
+            self.diseaseConstants["susceptible"] = self.prompt_percentage("Susceptible people")
+            self.diseaseConstants["immune"] = self.prompt_percentage("Immune people")
             self.diseaseConstants["carrier"] = self.prompt_percentage("Carrier people")
-            self.diseaseConstants["sick"] = self.prompt_percentage("Sick people")
+            self.diseaseConstants["infected"] = self.prompt_percentage("Infected people")
             status_total = sum(list(self.diseaseConstants.values())[1:5])
 
             if status_total == 1:
@@ -51,7 +51,7 @@ class Simulation:
     def init__grid(self) -> None: # initialize the grid with people based on the density and proportions
         # Total population based on density
         population = round(self.SHAPE[0] * self.SHAPE[1] * self.diseaseConstants["density"])
-        statuses = ["healthy", "vaccinated", "carrier", "sick"]
+        statuses = ["susceptible", "immune", "carrier", "infected"]
         proportions = [self.diseaseConstants[s] for s in statuses]
 
         # Calculate the initial counts
@@ -165,6 +165,8 @@ class Simulation:
         return (0,0)
 
     def update(self) -> None: # update the matrix
+        inter_matrix = self.matrix.copy()
+
         for row in range(self.SHAPE[0]):
             for column in range(self.SHAPE[1]):
 
@@ -176,9 +178,10 @@ class Simulation:
 
                     if new_type != person.status:
                         if new_type is not None:
-                            self.matrix[row,column] = Person(new_type)
+                            inter_matrix[row,column] = Person(new_type)
                         else:
-                            self.matrix[row,column] = None
+                            inter_matrix[row,column] = None
+        self.matrix = inter_matrix
         return
 
     def run(self) -> None:
@@ -203,7 +206,7 @@ class Simulation:
             self.screen.fill(self.BLACK)
             self.draw()
             pygame.display.flip()
-            self.clock.tick(5)
+            self.clock.tick(30)
 
             if not paused:
                 self.update()

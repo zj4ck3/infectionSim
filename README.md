@@ -1,6 +1,6 @@
 # InfectionSim
 `infectionSim` is a python GUI application with command-line variable for simulate the spread of an airborne infectious disease through a population, modeling transmission dynamics and individual infection outcomes. 
-Individuals may be **healthy (and susceptible), infected (sick), vaccinated or carrier**
+Individuals may be **healthy (and susceptible), infected (sick), immune (or vaccinated) or carrier** and after infection: **recovered or dead**.
 The model is conceptually inspired by respiratory infections such as **COVID-19, influenza, and measles**
 
 Note: The probabilistic formulation used in this model is not scientifically accurate, but it provides a good visual representation of how an infectious disease spreads through a population (it is not modelled with differential equations).
@@ -8,10 +8,12 @@ Note: The probabilistic formulation used in this model is not scientifically acc
 ## Features
 
 Type of possible cells status and color coding:
-- healthy people = blue cells
+- susceotible but healthy people = blue cells
 - vaccinated or immune people = green cells
 - carrier people = yellow cells
 - infected (with symptoms or not) = red cells
+- recovered people = fucsia cells
+- dead people = brown cells
 - non people (to indicate the absence of trasmission media) = black cells
 
 Initial variables:

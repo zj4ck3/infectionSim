@@ -17,10 +17,10 @@ def test_ask_pre_info(monkeypatch, simulation):
     simulation.ask_pre_info()
 
     assert simulation.diseaseConstants["density"] == 0.9
-    assert simulation.diseaseConstants["healthy"] == 0.4
-    assert simulation.diseaseConstants["vaccinated"] == 0.3
+    assert simulation.diseaseConstants["susceptible"] == 0.4
+    assert simulation.diseaseConstants["immune"] == 0.3
     assert simulation.diseaseConstants["carrier"] == 0.2
-    assert simulation.diseaseConstants["sick"] == 0.1
+    assert simulation.diseaseConstants["infected"] == 0.1
     assert simulation.diseaseConstants["mortality"] == 0.05
 
 @pytest.mark.parametrize("density, expected_population", [

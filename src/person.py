@@ -4,24 +4,32 @@ class Person:
         return
 
     def change_status(self, status: str):
-        if status == "healthy":
+        self.days_in_state = 0
+
+        if status == "susceptible":
             self.status = status
             self.id = 1
             self.color = (0, 0, 255) # blue
-        elif status == "sick":
+        elif status == "infected":
             self.status = status
             self.id = 2
-            self.days = 0 # days of sickness
             self.color = (255, 0, 0) # red
         elif status == "carrier":
             self.status = status
             self.id = 3
-            self.days = 0 # days of carrier
             self.color = (255, 255, 0) # yellow
-        elif status == "vaccinated":
+        elif status == "immune":
             self.status = status
             self.id = 4
             self.color = (0, 255, 0) # green
+        elif status == "dead":
+            self.status = status
+            self.id = 5
+            self.color = (64,32,0) # brown
+        elif status == "recovered":
+            self.status = status
+            self.id = 6
+            self.color = (255,0,255) # fucsia
         else:
             raise ValueError("invalid status")
         return

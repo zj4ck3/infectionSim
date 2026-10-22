@@ -1,3 +1,4 @@
+-e git+https://github.com/zj4ck3/infectionSim.git@f0f58935071e767eba57b3b3e2a5c69e43028c3a#egg=infectionSim
 iniconfig==2.3.1
 numpy==2.5.4
 packaging==26.3
