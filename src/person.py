@@ -46,7 +46,7 @@ class Person:
         
         # if a person is recovered, is immune for a bit of time, then it become again susceptible
         elif self.status == "recovered":
-            if self.days_in_state >= 15:
+            if self.days_in_state >= 25:
                 return "susceptible"
             else:
                 self.days_in_state += 1
@@ -54,7 +54,7 @@ class Person:
 
         # if a person is infected, after a bit of time can become dead or recovered with a probability
         elif self.status == "infected":
-            if self.days_in_state >= 7: 
+            if self.days_in_state >= 8: 
                 if random() > mortality:
                     return "recovered"
                 else:
@@ -65,7 +65,7 @@ class Person:
 
         # if a person is immune, the status doesen't change for a bit of time
         elif self.status == "immune":
-            if self.days_in_state >= 13:
+            if self.days_in_state >= 40:
                 return "susceptible"
             else:
                 self.days_in_state += 1
@@ -73,7 +73,7 @@ class Person:
 
         # if a person is carrier after a bit of time can be recovered or infected
         elif self.status == "carrier":
-            if self.days_in_state >= 3:
+            if self.days_in_state >= 5:
                 if random() < P_HEALTYFROMCARRIER:
                     return "recovered"
                 else:
