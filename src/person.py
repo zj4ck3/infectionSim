@@ -1,5 +1,5 @@
 from random import random
-P_TRASMISSION = 0.08 # probability that only 1 infected infect a susceptible
+P_TRASMISSION = 0.05 # probability that only 1 infected infect a susceptible
 P_CARRIER = 0.6 # Probability that a susceptible enters in carrier status and not infected
 P_HEALTYFROMCARRIER = 0.1
 
@@ -8,7 +8,7 @@ class Person:
         self.change_status(status)
         return
 
-    def change_status(self, status: str):
+    def change_status(self, status: str) -> None:
         self.days_in_state = 0
 
         if status == "susceptible":
@@ -46,7 +46,7 @@ class Person:
         
         # if a person is recovered, is immune for a bit of time, then it become again susceptible
         elif self.status == "recovered":
-            if self.days_in_state >= 25:
+            if self.days_in_state >= 30:
                 return "susceptible"
             else:
                 self.days_in_state += 1
@@ -54,7 +54,7 @@ class Person:
 
         # if a person is infected, after a bit of time can become dead or recovered with a probability
         elif self.status == "infected":
-            if self.days_in_state >= 8: 
+            if self.days_in_state >= 9: 
                 if random() > mortality:
                     return "recovered"
                 else:
@@ -65,7 +65,7 @@ class Person:
 
         # if a person is immune, the status doesen't change for a bit of time
         elif self.status == "immune":
-            if self.days_in_state >= 40:
+            if self.days_in_state >= 50:
                 return "susceptible"
             else:
                 self.days_in_state += 1

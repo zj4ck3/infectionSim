@@ -41,3 +41,20 @@ def test_init_grid(monkeypatch, simulation, density, expected_population):
                 counter += 1
 
     assert counter == expected_population
+
+def test_no_deaths_without_infected(monkeypatch, simulation):
+    info = iter([90, 100, 0, 0, 0, 100])
+    monkeypatch.setattr("builtins.input", lambda _: str(next(info)))
+
+    simulation.ask_pre_info()
+    simulation.init__grid()
+    for _ in range(10):
+        simulation.update()
+
+    dead_count = sum(
+        1
+        for person in simulation.matrix.flat
+        if person is not None and person.status == "dead"
+    )
+
+    assert dead_count == 0

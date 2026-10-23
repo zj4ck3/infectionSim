@@ -180,7 +180,7 @@ class Simulation:
                     near_cell["transmissible"] += 1
         return near_cell
 
-    def update(self) -> None: # update the matrix
+    def update(self) -> None:
         inter_matrix = self.matrix.copy()
 
         for row in range(self.SHAPE[0]):
@@ -227,6 +227,7 @@ class Simulation:
             if not paused:
                 self.update()
         pygame.quit()
+        return
 
     def info(self) -> None: # display information
         pass

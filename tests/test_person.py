@@ -25,3 +25,11 @@ def test_change_status(person, status, expected_id, color):
 def test_invalid_status(person):
     with pytest.raises(ValueError, match="invalid status"):
         person.change_status("invalid_status")
+
+def test_dead_person_stays_dead(person):
+    person.change_status("dead")
+    neighbours = {"transmissible": 8, "untransmissible": 0}
+    
+    for i in range(10):
+        result = person.calculate_change(neighbours, mortality=1.0)
+        assert result == "dead"
