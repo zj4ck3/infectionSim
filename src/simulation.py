@@ -208,6 +208,7 @@ class Simulation:
         
         running = True
         paused = False
+        ticking = 3
 
         while running:
             for event in pygame.event.get():
@@ -219,10 +220,23 @@ class Simulation:
                     if event.key == pygame.K_SPACE:
                         paused = not paused
 
+                    elif event.key in (pygame.K_KP_PLUS, pygame.K_PLUS, pygame.K_EQUALS):
+                        ticking += 2
+
+                    elif event.key in (pygame.K_KP_MINUS, pygame.K_MINUS):
+                        ticking = max(1, ticking - 2)
+
+                    elif event.key == pygame.K_r:
+                        for i in range(self.SHAPE[0]):
+                            for j in range(self.SHAPE[1]):
+                                if self.matrix[i,j] is not None:
+                                    if self.matrix[i,j].status in ["infected", "carrier"]:
+                                        self.matrix[i,j].change_status("recovered")
+
             self.screen.fill(self.BLACK)
             self.draw()
             pygame.display.flip()
-            self.clock.tick(3)
+            self.clock.tick(ticking)
 
             if not paused:
                 self.update()
