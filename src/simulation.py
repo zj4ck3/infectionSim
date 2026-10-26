@@ -11,6 +11,7 @@ class Simulation:
         self.WINDOW_SIZE = (1200, 800) # width, height
         self.BLACK = (0, 0, 0)
         self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        self.graph = [[],[],[],[],[]] # susceptible, carrier, infected, recovered, dead
         return
 
     def prompt_percentage(self, label: str) -> float: # for user handling in ask_pre_info
@@ -181,6 +182,7 @@ class Simulation:
         return near_cell
 
     def update(self) -> None:
+        self.put_in_graph()
         inter_matrix = self.matrix.copy()
 
         for row in range(self.SHAPE[0]):
@@ -199,6 +201,30 @@ class Simulation:
                             inter_matrix[row,column] = None
         self.matrix = inter_matrix
         return
+
+    def put_in_graph(self) -> None: # put in a matrix the various counts
+        susceptible, carrier, infected = 0, 0, 0
+        dead, recovered = 0, 0
+
+        for i in range(self.WIDTH):
+            for j in range(self.HEIGHT):
+                if self.matrix[i,j] == "susceptible":
+                    susceptible += 1
+                elif self.matrix[i,j] == "carrier":
+                    carrier += 1
+                elif self.matrix[i,j] == "infected":
+                    infected += 1
+                elif self.matrix[i,j] == "dead":
+                    dead += 1
+                elif self.matrix[i,j] == "recovered":
+                    recovered += 1
+
+        self.graph[0].append(susceptible)
+        self.graph[1].append(carrier)
+        self.graph[2].append(infected)
+        self.graph[3].append(recovered)
+        self.graph[4].append(dead)
+        return 
 
     def run(self) -> None:
         pygame.init()
