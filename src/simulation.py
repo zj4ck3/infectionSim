@@ -209,6 +209,7 @@ class Simulation:
         running = True
         paused = False
         ticking = 3
+        selected_status = "susceptible"
 
         while running:
             for event in pygame.event.get():
@@ -232,6 +233,48 @@ class Simulation:
                                 if self.matrix[i,j] is not None:
                                     if self.matrix[i,j].status in ["infected", "carrier"]:
                                         self.matrix[i,j].change_status("recovered")
+                    
+                    elif event.key == pygame.K_s:
+                        selected_status = "susceptible"
+                    elif event.key == pygame.K_v:
+                        selected_status = "immune"
+                    elif event.key == pygame.K_c:
+                        selected_status = "carrier"
+                    elif event.key == pygame.K_i:
+                        selected_status = "infected"
+                    elif event.key == pygame.K_d:
+                        selected_status = "dead"
+                    elif event.key == pygame.K_n:
+                        selected_status = None
+                    elif event.key == pygame.K_h:
+                        selected_status = "recovered"
+                
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # sx mouse button
+                        mouse_x, mouse_y = event.pos
+                        screen_width, screen_height = self.screen.get_size()
+                        rows, columns = self.matrix.shape
+
+                        cell_size = min(
+                            screen_width / columns,
+                            screen_height / rows
+                        )
+
+                        grid_width = columns * cell_size
+                        grid_height = rows * cell_size
+
+                        offset_x = (screen_width - grid_width) / 2
+                        offset_y = (screen_height - grid_height) / 2
+
+                        if (offset_x <= mouse_x < offset_x + grid_width
+                            and offset_y <= mouse_y < offset_y + grid_height):
+                            column = int((mouse_x - offset_x) / cell_size)
+                            row = int((mouse_y - offset_y) / cell_size)
+
+                            if selected_status is None:
+                                self.matrix[row, column] = None
+                            else:
+                                self.matrix[row, column] = Person(selected_status)
 
             self.screen.fill(self.BLACK)
             self.draw()
