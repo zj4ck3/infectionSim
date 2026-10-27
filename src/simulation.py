@@ -1,17 +1,19 @@
 from person import Person
+import matplotlib.pyplot as plt
+from random import choice, shuffle
+from numpy import full
 import pygame
-import random
-import numpy
 
 class Simulation:
     def __init__(self, SHAPE:tuple) -> None:
         self.SHAPE = self.WIDTH, self.HEIGHT = SHAPE
-        self.matrix = numpy.full(self.SHAPE, None, dtype=object) # full the matrix with None
+        self.matrix = full(self.SHAPE, None, dtype=object) # full the matrix with None
+        self.GEN = 0
         
         self.WINDOW_SIZE = (1200, 800) # width, height
         self.BLACK = (0, 0, 0)
         self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
-        self.graph = [[],[],[],[],[]] # susceptible, carrier, infected, recovered, dead
+        self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
         return
 
     def prompt_percentage(self, label: str) -> float: # for user handling in ask_pre_info
@@ -47,6 +49,7 @@ class Simulation:
         self.diseaseConstants["mortality"] = self.prompt_percentage("Mortality rate")        
         print("\n[V] Configuration completed correctly")
         print("[#] Initializing grid...")
+        print("[#] X to exit, ESC to exit with graph")
         return
 
     def init__grid(self) -> None: # initialize the grid with people based on the density and proportions
@@ -85,18 +88,18 @@ class Simulation:
             for x in range(self.SHAPE[0])
             for y in range(self.SHAPE[1])
         ]
-        random.shuffle(positions)
+        shuffle(positions)
 
         # Assign people to random positions
         for i in range(population):
             while True:
-                choice = random.choice(statuses)
+                choice_made = choice(statuses)
 
-                if counts[choice] > 0:
-                    counts[choice] -= 1
+                if counts[choice_made] > 0:
+                    counts[choice_made] -= 1
                     break
 
-            self.matrix[positions[i]] = Person(choice)
+            self.matrix[positions[i]] = Person(choice_made)
         return
 
     def draw(self) -> None:
@@ -204,27 +207,50 @@ class Simulation:
 
     def put_in_graph(self) -> None: # put in a matrix the various counts
         susceptible, carrier, infected = 0, 0, 0
-        dead, recovered = 0, 0
+        dead, recovered, immune = 0, 0, 0
 
         for i in range(self.WIDTH):
             for j in range(self.HEIGHT):
-                if self.matrix[i,j] == "susceptible":
-                    susceptible += 1
-                elif self.matrix[i,j] == "carrier":
-                    carrier += 1
-                elif self.matrix[i,j] == "infected":
-                    infected += 1
-                elif self.matrix[i,j] == "dead":
-                    dead += 1
-                elif self.matrix[i,j] == "recovered":
-                    recovered += 1
+                if self.matrix[i,j] is not None:
+                    if self.matrix[i,j].status == "susceptible":
+                        susceptible += 1
+                    elif self.matrix[i,j].status == "carrier":
+                        carrier += 1
+                    elif self.matrix[i,j].status == "infected":
+                        infected += 1
+                    elif self.matrix[i,j].status == "dead":
+                        dead += 1
+                    elif self.matrix[i,j].status == "recovered":
+                        recovered += 1
+                    elif self.matrix[i,j].status == "immune":
+                        immune += 1
 
         self.graph[0].append(susceptible)
         self.graph[1].append(carrier)
         self.graph[2].append(infected)
         self.graph[3].append(recovered)
         self.graph[4].append(dead)
+        self.graph[5].append(immune)
+        self.graph[6].append(self.GEN)
         return 
+
+    def make_graph(self) -> None:
+        # susceptible, carrier, infected, recovered, dead, immune, gen
+        plt.figure(figsize=(12, 8))
+        plt.plot(self.graph[6], self.graph[0], color="blue", label="susceptible", lw=2.5)
+        plt.plot(self.graph[6], self.graph[1], color="yellow", label="carrier", lw=2.5)
+        plt.plot(self.graph[6], self.graph[2], color="red", label="infected", lw=2.5)
+        plt.plot(self.graph[6], self.graph[3], color="purple", label="recovered", lw=2.5)
+        plt.plot(self.graph[6], self.graph[4], color="brown", label="dead", lw=2.5)
+        plt.plot(self.graph[6], self.graph[5], color="green", label="immune", lw=2.5)
+
+        plt.title("Trend of type of people:")
+        plt.xlabel("Generation")
+        plt.ylabel("N. type of person")
+        plt.legend(loc="upper right", bbox_to_anchor=(0.85, 0.95))
+        plt.grid(True)
+        plt.show()
+        return
 
     def run(self) -> None:
         pygame.init()
@@ -274,6 +300,10 @@ class Simulation:
                         selected_status = None
                     elif event.key == pygame.K_h:
                         selected_status = "recovered"
+                    elif event.key == pygame.K_ESCAPE:
+                        self.put_in_graph()
+                        running = False
+                        self.make_graph()
                 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # sx mouse button
@@ -308,6 +338,7 @@ class Simulation:
             self.clock.tick(ticking)
 
             if not paused:
+                self.GEN += 1
                 self.update()
         pygame.quit()
         return
