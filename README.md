@@ -1,96 +1,151 @@
 # InfectionSim
-`infectionSim` is a python GUI application with command-line variable for simulate the spread of an airborne infectious disease through a population, modeling transmission dynamics and individual infection outcomes. 
-Individuals may be **healthy (and susceptible), infected (sick), immune (or vaccinated) or carrier** and after infection: **recovered or dead**.
-The model is conceptually inspired by respiratory infections such as **COVID-19, influenza, and measles**
 
-Note: The probabilistic formulation used in this model is not scientifically accurate, but it provides a good visual representation of how an infectious disease spreads through a population (it is not modelled with differential equations).
+**InfectionSim** is a Python application with a graphical user interface (GUI) and command-line inputs for simulating the spread of an airborne infectious disease through a population. It models transmission dynamics and individual health outcomes over time.
+
+Individuals can be **healthy (susceptible), carriers, infected, immune (including vaccinated individuals), recovered, or dead**.
+
+The model is conceptually inspired by respiratory infectious diseases such as **COVID-19, influenza, and measles**.
+
+> **Disclaimer:** InfectionSim is an educational and visualization tool, not a scientifically validated epidemiological model. Its simplified probabilistic approach provides a visual representation of how an infectious disease can spread through a population. The simulation does not use differential equations and should not be used to make real-world epidemiological predictions.
 
 ## Features
 
-Type of possible cells status and color coding:
-- susceotible but healthy people = blue cells
-- vaccinated or immune people = green cells
-- carrier people = yellow cells
-- infected (with symptoms or not) = red cells
-- recovered people = fucsia cells
-- dead people = brown cells
-- non people (to indicate the absence of trasmission media) = black cells
+### Health statuses and color coding
 
-Initial variables:
-- % density of population = N people / N total cells 
-- % healthy people = N healthy people / N total people
-- % carrier people = N carrier people / N total people
-- % sick people = N sick people / N total people
-- % vaccinated people = N vaccinated people / N total people
-Note: The percentages of healthy, sick, carrier, and vaccinated individuals must add up to 100%.
+The simulation represents individuals as colored cells in a population grid.
+
+| Status | Description | Color |
+|---|---|---|
+| Susceptible | Healthy individuals who can become infected | Blue |
+| Immune | Vaccinated or otherwise immune individuals | Green |
+| Carrier | Individuals carrying the infectious agent | Yellow |
+| Infected | Individuals with or without symptoms | Red |
+| Recovered | Individuals who have recovered from the infection | Magenta |
+| Dead | Individuals who have died | Brown |
+| Empty cell | No individual present | Black |
+
+### Initial parameters
+
+At startup, the application requests the following parameters:
+
+- **Population density:** Percentage of cells occupied by individuals, calculated as the number of individuals divided by the total number of cells.
+- **Healthy individuals:** Percentage of the population that is healthy and susceptible.
+- **Carriers:** Percentage of the population classified as carriers.
+- **Infected individuals:** Percentage of the population that is infected.
+- **Vaccinated individuals:** Percentage of the population that is vaccinated.
+
+The initial percentages of healthy, carrier, infected, and vaccinated individuals must add up to **100% of the population**.
+
+### Simulation results
+
+When the simulation is terminated using `ESC`, a graph displaying the trends of the different population categories is generated using **Matplotlib**.
+
+The graph supports interactive inspection, including **zooming in and out**, and can be **saved as an image file** using Matplotlib's toolbar.
 
 ## Requirements
 
 - Python 3.9 or newer
-- the dependencies wrote in the requirements.txt file
+- The dependencies listed in `requirements.txt`
 
-The application uses:
-- `numpy` for the matrix handling
-- `pygame-ce` for GUI managing and keyboard features
-Other eventual libraries are builtin
+The application uses the following libraries:
+
+- `numpy` — Matrix handling and numerical operations.
+- `pygame-ce` — GUI rendering, simulation visualization, and keyboard/mouse input.
+- `matplotlib` — Plotting and visualizing simulation results.
+- `pytest` — Automated testing of the application (used for the test suite).
+
+Any additional dependencies are listed in `requirements.txt`. Other functionality relies on Python's standard library.
 
 ## Installation
 
-1. Clone the repository and enter its directory:
+### 1. Clone the repository
 
-	```bash
-	git clone https://github.com/zj4ck3/infectionSim.git
-	cd infectionSim
-	```
+```bash
+git clone https://github.com/zj4ck3/infectionSim.git
+cd infectionSim
+```
 
-2. Create and activate a virtual environment (recommended):
+### 2. Create and activate a virtual environment
 
-	```bash
-	python3 -m venv .venv
-	source .venv/bin/activate
-	```
+On Linux and macOS:
 
-	On Windows PowerShell, activate it with:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-	```powershell
-	.venv\Scripts\Activate.ps1
-	```
+On Windows PowerShell:
 
-3. Install the dependencies:
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
 
-	```bash
-	python3 -m pip install -r requirements.txt
-	```
+### 3. Install the dependencies
 
-4. Install the package in editable mode:
+```bash
+python -m pip install -r requirements.txt
+```
 
-	```bash
-	python3 -m pip install -e .
-	```
+### 4. Install the package in editable mode
+
+```bash
+python -m pip install -e .
+```
+
+Editable mode allows you to modify the source code without reinstalling the package after every change. It is also useful when working on the project and running its tests.
 
 ## Usage
 
-Start the application with:
+### Start the application
+
+Run the following command from the project's root directory:
 
 ```bash
-python3 src/main.py
+python src/main.py
 ```
 
-Usage:
-- initialization = it asks you some command-line variables about density of population and starting information.
-- running phase:
-  - SPACE = Pause the simulation
-  - Click "X" = Quit the simulation
+### 1. Initialization
+
+At startup, the application requests command-line parameters, including population density and the initial distribution of individuals among the different health statuses.
+
+### 2. Simulation controls
+
+| Key / Input | Action |
+|---|---|
+| `SPACE` | Pause the simulation |
+| `+` / `-` | Increase or decrease the simulation speed (tick rate) |
+| `R` | Convert all infected individuals and carriers into recovered individuals |
+| Left mouse button | Change the selected cell's status when the simulation is paused |
+
+To modify an individual's status, pause the simulation, select the desired status using the corresponding key, and then click the target cell with the left mouse button.
+
+#### Cell status editing
+
+| Key | New status |
+|---|---|
+| `S` | Susceptible |
+| `V` | Immune / vaccinated |
+| `C` | Carrier |
+| `I` | Infected |
+| `D` | Dead |
+| `H` | Recovered |
+| `N` | Empty cell |
+
+### 3. Exiting the simulation
+
+- **`ESC`** — End the simulation and display a graph of the population trends. The graph can be zoomed and saved using Matplotlib's toolbar.
+- **Window close button (`X`)** — Exit the application.
 
 ## Project Structure
 
 ```text
 infectionSim/
-├── src/                    # Source code
+├── src/
 │   ├── main.py             # Application entry point
-│   ├── simulation.py       # Pygame rendering and simulation updates
+│   ├── simulation.py       # Simulation logic and Pygame rendering
 │   └── person.py           # Person class and health status transitions
-├── tests/                  # Automated tests
+├── tests/
 │   ├── test_person.py      # Tests for person.py
 │   └── test_simulation.py  # Tests for simulation.py
 ├── requirements.txt        # Python dependencies
@@ -101,7 +156,18 @@ infectionSim/
 
 ## Contributing
 
-Bug reports, suggestions, and pull requests are welcome. Before submitting a change, verify that the application starts successfully and that the tests are all passed
+Bug reports, suggestions, and pull requests are welcome.
+
+Before submitting a change, please verify that:
+
+- The application starts and runs correctly.
+- All automated tests pass.
+
+Run the test suite with:
+
+```bash
+python -m pytest
+```
 
 ## License
 

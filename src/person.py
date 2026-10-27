@@ -65,7 +65,7 @@ class Person:
 
         # if a person is immune, the status doesen't change for a bit of time
         elif self.status == "immune":
-            if self.days_in_state >= 50:
+            if self.days_in_state >= 65:
                 return "susceptible"
             else:
                 self.days_in_state += 1

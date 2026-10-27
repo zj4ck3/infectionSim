@@ -10,7 +10,7 @@ class Simulation:
         self.matrix = full(self.SHAPE, None, dtype=object) # full the matrix with None
         self.GEN = 0
         
-        self.WINDOW_SIZE = (1200, 800) # width, height
+        self.WINDOW_SIZE = (1200, 800) # width, height 1200, 800
         self.BLACK = (0, 0, 0)
         self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
