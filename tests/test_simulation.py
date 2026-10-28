@@ -48,6 +48,7 @@ def test_no_deaths_without_infected(monkeypatch, simulation):
 
     simulation.ask_pre_info()
     simulation.init__grid()
+    monkeypatch.setattr(simulation, "info", lambda: None)
     for _ in range(10):
         simulation.update()
 

@@ -5,12 +5,13 @@ from numpy import full
 import pygame
 
 class Simulation:
-    def __init__(self, SHAPE:tuple) -> None:
+    def __init__(self, SHAPE:tuple, window_size:tuple = (1200, 800)) -> None:
         self.SHAPE = self.WIDTH, self.HEIGHT = SHAPE
         self.matrix = full(self.SHAPE, None, dtype=object) # full the matrix with None
         self.GEN = 0
         
-        self.WINDOW_SIZE = (1200, 800) # width, height 1200, 800
+        self.SIMULATION_SIZE = (1200, 800)
+        self.WINDOW_SIZE = window_size
         self.BLACK = (0, 0, 0)
         self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
         self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
@@ -103,7 +104,7 @@ class Simulation:
         return
 
     def draw(self) -> None:
-        screen_width, screen_height = self.screen.get_size()
+        screen_width, screen_height = self.SIMULATION_SIZE
         rows, columns = self.matrix.shape
 
         # Calculate a single size for square cells
@@ -112,11 +113,10 @@ class Simulation:
             screen_height / rows
         )
 
-        # Center the grid in the window
         grid_width = columns * cell_size
         grid_height = rows * cell_size
-        offset_x = (screen_width - grid_width) / 2
-        offset_y = (screen_height - grid_height) / 2
+        offset_x = 0
+        offset_y = 0
 
         # Draw the cells
         for row in range(rows):
@@ -203,6 +203,7 @@ class Simulation:
                         else:
                             inter_matrix[row,column] = None
         self.matrix = inter_matrix
+        self.info()
         return
 
     def put_in_graph(self) -> None: # put in a matrix the various counts
@@ -257,6 +258,8 @@ class Simulation:
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE, pygame.RESIZABLE)
         pygame.display.set_caption("Infection simulation")
         self.clock = pygame.time.Clock()
+        windowed_size = self.screen.get_size()
+        fullscreen = False
         
         running = True
         paused = False
@@ -268,9 +271,20 @@ class Simulation:
                 if event.type == pygame.QUIT:
                     running = False
 
+                elif event.type == pygame.VIDEORESIZE and not fullscreen:
+                    windowed_size = event.size
+                    self.screen = pygame.display.set_mode(windowed_size, pygame.RESIZABLE)
+
                 elif event.type == pygame.KEYDOWN:
-                    # SPACE -> pause / resume
-                    if event.key == pygame.K_SPACE:
+                    if event.key == pygame.K_F11:
+                        if fullscreen:
+                            self.screen = pygame.display.set_mode(windowed_size, pygame.RESIZABLE)
+                        else:
+                            windowed_size = self.screen.get_size()
+                            self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+                        fullscreen = not fullscreen
+
+                    elif event.key == pygame.K_SPACE:
                         paused = not paused
 
                     elif event.key in (pygame.K_KP_PLUS, pygame.K_PLUS, pygame.K_EQUALS):
@@ -308,7 +322,7 @@ class Simulation:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # sx mouse button
                         mouse_x, mouse_y = event.pos
-                        screen_width, screen_height = self.screen.get_size()
+                        screen_width, screen_height = self.SIMULATION_SIZE
                         rows, columns = self.matrix.shape
 
                         cell_size = min(
@@ -319,8 +333,8 @@ class Simulation:
                         grid_width = columns * cell_size
                         grid_height = rows * cell_size
 
-                        offset_x = (screen_width - grid_width) / 2
-                        offset_y = (screen_height - grid_height) / 2
+                        offset_x = 0
+                        offset_y = 0
 
                         if (offset_x <= mouse_x < offset_x + grid_width
                             and offset_y <= mouse_y < offset_y + grid_height):
@@ -334,6 +348,7 @@ class Simulation:
 
             self.screen.fill(self.BLACK)
             self.draw()
+            self.info()
             pygame.display.flip()
             self.clock.tick(ticking)
 
@@ -344,4 +359,13 @@ class Simulation:
         return
 
     def info(self) -> None: # display information
-        pass
+        text_init = pygame.font.SysFont(None, 36)
+
+        total_cells = self.WIDTH * self.HEIGHT
+        cells_surface = text_init.render(f"Celle totali: {total_cells}", True, (255, 255, 255))
+        screen_width, screen_height = self.SIMULATION_SIZE
+        rows, columns = self.matrix.shape
+        cell_size = min(screen_width / columns, screen_height / rows)
+        grid_right = round(columns * cell_size)
+        cel_rect = cells_surface.get_rect(topleft=(grid_right + 20, 20))
+        self.screen.blit(cells_surface, cel_rect)
