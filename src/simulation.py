@@ -386,4 +386,12 @@ class Simulation:
         generation = text_init.render(f"Generation: {self.GEN}", True, (255,255,255))    
         generation_rect = generation.get_rect(topleft=(grid_right + 20, 90))
         self.screen.blit(generation, generation_rect)
+
+        # population not dead
+        population = sum(1 for i in self.matrix.flat if i is not None if i.status != "dead")
+        N_cell = self.SHAPE[0] * self.SHAPE[1]
+        
+        pop = text_init.render(f"Population: {population} - {round((population/N_cell)*100,1)}", True, (255,255,255))    
+        pop_rect = pop.get_rect(topleft=(grid_right + 20, 120))
+        self.screen.blit(pop, pop_rect)
         return
