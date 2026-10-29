@@ -6,15 +6,20 @@ import pygame
 
 class Simulation:
     def __init__(self, SHAPE:tuple, window_size:tuple = (1200, 800)) -> None:
+        # matrix variables
         self.SHAPE = self.WIDTH, self.HEIGHT = SHAPE
         self.matrix = full(self.SHAPE, None, dtype=object) # full the matrix with None
-        self.GEN = 0
-        
-        self.SIMULATION_SIZE = (1200, 800)
-        self.WINDOW_SIZE = window_size
-        self.BLACK = (0, 0, 0)
         self.neighbour = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+        # feature variables
+        self.BLACK = (0, 0, 0)
+        self.GEN = 0
         self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
+
+        # windows and screen variables
+        self.paused = False
+        self.WINDOW_SIZE = window_size
+        self.ticking = 3
         return
 
     def prompt_percentage(self, label: str) -> float: # for user handling in ask_pre_info
@@ -51,6 +56,7 @@ class Simulation:
         print("\n[V] Configuration completed correctly")
         print("[#] Initializing grid...")
         print("[#] X to exit, ESC to exit with graph")
+        print("[#] Full screen for better experience")
         return
 
     def init__grid(self) -> None: # initialize the grid with people based on the density and proportions
@@ -104,7 +110,7 @@ class Simulation:
         return
 
     def draw(self) -> None:
-        screen_width, screen_height = self.SIMULATION_SIZE
+        screen_width, screen_height = self.screen.get_size()
         rows, columns = self.matrix.shape
 
         # Calculate a single size for square cells
@@ -262,8 +268,6 @@ class Simulation:
         fullscreen = False
         
         running = True
-        paused = False
-        ticking = 3
         selected_status = "susceptible"
 
         while running:
@@ -285,13 +289,13 @@ class Simulation:
                         fullscreen = not fullscreen
 
                     elif event.key == pygame.K_SPACE:
-                        paused = not paused
+                        self.paused = not self.paused
 
-                    elif event.key in (pygame.K_KP_PLUS, pygame.K_PLUS, pygame.K_EQUALS):
-                        ticking += 2
+                    elif event.key in (pygame.K_KP_PLUS, pygame.K_PLUS):
+                        self.ticking += 2
 
                     elif event.key in (pygame.K_KP_MINUS, pygame.K_MINUS):
-                        ticking = max(1, ticking - 2)
+                        self.ticking = max(1, self.ticking - 2)
 
                     elif event.key == pygame.K_r:
                         for i in range(self.SHAPE[0]):
@@ -322,7 +326,7 @@ class Simulation:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:  # sx mouse button
                         mouse_x, mouse_y = event.pos
-                        screen_width, screen_height = self.SIMULATION_SIZE
+                        screen_width, screen_height = self.screen.get_size()
                         rows, columns = self.matrix.shape
 
                         cell_size = min(
@@ -350,9 +354,9 @@ class Simulation:
             self.draw()
             self.info()
             pygame.display.flip()
-            self.clock.tick(ticking)
+            self.clock.tick(self.ticking)
 
-            if not paused:
+            if not self.paused:
                 self.GEN += 1
                 self.update()
         pygame.quit()
@@ -360,12 +364,26 @@ class Simulation:
 
     def info(self) -> None: # display information
         text_init = pygame.font.SysFont(None, 36)
+        screen_width, screen_height = self.screen.get_size()
+        cell_size = min(screen_width / self.SHAPE[1], screen_height / self.SHAPE[0])
+        grid_right = round(self.SHAPE[1] * cell_size)
 
-        total_cells = self.WIDTH * self.HEIGHT
-        cells_surface = text_init.render(f"Celle totali: {total_cells}", True, (255, 255, 255))
-        screen_width, screen_height = self.SIMULATION_SIZE
-        rows, columns = self.matrix.shape
-        cell_size = min(screen_width / columns, screen_height / rows)
-        grid_right = round(columns * cell_size)
-        cel_rect = cells_surface.get_rect(topleft=(grid_right + 20, 20))
-        self.screen.blit(cells_surface, cel_rect)
+        # state
+        if self.paused:
+            state = text_init.render("State: paused", True, (255,0,0))
+        else:
+            state = text_init.render("State: running", True, (0,255,0))
+        
+        state_rect = state.get_rect(topleft=(grid_right + 20, 30))
+        self.screen.blit(state, state_rect)
+        
+        # ticking
+        tick = text_init.render(f"Speed: {self.ticking}", True, (255,255,255))    
+        tick_rect = tick.get_rect(topleft=(grid_right + 20, 60))
+        self.screen.blit(tick, tick_rect)
+
+        # generation
+        generation = text_init.render(f"Generation: {self.GEN}", True, (255,255,255))    
+        generation_rect = generation.get_rect(topleft=(grid_right + 20, 90))
+        self.screen.blit(generation, generation_rect)
+        return
