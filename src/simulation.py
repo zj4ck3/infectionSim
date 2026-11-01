@@ -388,10 +388,66 @@ class Simulation:
         self.screen.blit(generation, generation_rect)
 
         # population not dead
-        population = sum(1 for i in self.matrix.flat if i is not None if i.status != "dead")
+        population, non, susc, imm, carr, inf, rec, death = 0, 0, 0, 0, 0, 0, 0, 0
+        for i in self.matrix.flat:
+            if i is not None:
+                if i.status != "dead":
+                    if i.status == "susceptible":
+                        susc += 1
+                    elif i.status == "immune":
+                        imm += 1
+                    elif i.status == "carrier":
+                        carr += 1
+                    elif i.status == "infected":
+                        inf += 1
+                    elif i.status == "recovered":
+                        rec += 1
+                    population += 1
+                else:
+                    death += 1
+            else:
+                non += 1
+
         N_cell = self.SHAPE[0] * self.SHAPE[1]
-        
-        pop = text_init.render(f"Population: {population} - {round((population/N_cell)*100,1)}", True, (255,255,255))    
-        pop_rect = pop.get_rect(topleft=(grid_right + 20, 120))
+        tot = text_init.render(f"Total cells: {N_cell}", True, (255,255,255))    
+        tot_rect = tot.get_rect(topleft=(grid_right + 20, 120))
+        self.screen.blit(tot, tot_rect)
+
+        non_pop = text_init.render(f"Clear cells: {round((non/N_cell)*100,1)} % - {non}", True, (255,255,255))    
+        non_pop_rect = non_pop.get_rect(topleft=(grid_right + 20, 150))
+        self.screen.blit(non_pop, non_pop_rect)
+
+        pop = text_init.render(f"Population: {round((population/N_cell)*100,1)} % - {population}", True, (255,255,255))    
+        pop_rect = pop.get_rect(topleft=(grid_right + 20, 180))
         self.screen.blit(pop, pop_rect)
+
+        susc_pop = text_init.render(f"Susceptible: {round((susc/N_cell)*100,1)} % - {susc}", True, (255,255,255))
+        susc_pop_rect = susc_pop.get_rect(topleft=(grid_right + 20, 210))
+        self.screen.blit(susc_pop, susc_pop_rect)
+
+        imm_pop = text_init.render(f"Immune: {round((imm/N_cell)*100,1)} % - {imm}", True, (255,255,255))
+        imm_pop_rect = imm_pop.get_rect(topleft=(grid_right + 20, 240))
+        self.screen.blit(imm_pop, imm_pop_rect)
+
+        carr_pop = text_init.render(f"Carrier: {round((carr/N_cell)*100,1)} % - {carr}", True, (255,255,255))
+        carr_pop_rect = carr_pop.get_rect(topleft=(grid_right + 20, 270))
+        self.screen.blit(carr_pop, carr_pop_rect)
+
+        inf_pop = text_init.render(f"Infected: {round((inf/N_cell)*100,1)} % - {inf}", True, (255,255,255))
+        inf_pop_rect = inf_pop.get_rect(topleft=(grid_right + 20, 300))
+        self.screen.blit(inf_pop, inf_pop_rect)
+
+        rec_pop = text_init.render(f"Recovered: {round((rec/N_cell)*100,1)} % - {rec}", True, (255,255,255))
+        rec_pop_rect = rec_pop.get_rect(topleft=(grid_right + 20, 330))
+        self.screen.blit(rec_pop, rec_pop_rect)
+
+        death_pop = text_init.render(f"Deaths: {round((death/N_cell)*100,1)} % - {death}", True, (255,255,255))
+        death_pop_rect = death_pop.get_rect(topleft=(grid_right + 20, 360))
+        self.screen.blit(death_pop, death_pop_rect)
+
+        mortality_rate = text_init.render(f"Mortality: {round(self.diseaseConstants['mortality']*100,1)} %", True, (255,255,255))
+        mortality_rate_rect = mortality_rate.get_rect(topleft=(grid_right + 20, 390))
+        self.screen.blit(mortality_rate, mortality_rate_rect)
         return
+
+    
