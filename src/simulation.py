@@ -448,17 +448,4 @@ class Simulation:
         mortality_rate = text_init.render(f"Mortality: {round(self.diseaseConstants['mortality']*100,2)} %", True, (255,255,255))
         mortality_rate_rect = mortality_rate.get_rect(topleft=(grid_right + 20, 390))
         self.screen.blit(mortality_rate, mortality_rate_rect)
-
-        inf_rate = text_init.render(f"Infection rate: {round((inf/population)*100,2)} %", True, (255,255,255))
-        inf_rate_rect = inf_rate.get_rect(topleft=(grid_right + 20, 420))
-        self.screen.blit(inf_rate, inf_rate_rect)
-
-        if rec + death == 0:
-            s_rate = 100.0
-        else: 
-            s_rate = round(((rec/(rec+death)))*100,2)
-        
-        survival_rate = text_init.render(f"Survival Rate (SR): {s_rate} %", True, (255,255,255))
-        survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 450))
-        self.screen.blit(survival_rate, survival_rate_rect)
         return
