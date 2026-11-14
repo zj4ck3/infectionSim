@@ -15,6 +15,7 @@ class Simulation:
         self.BLACK = (0, 0, 0)
         self.GEN = 0
         self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
+        self.infection_rate = 0.0
 
         # windows and screen variables
         self.paused = False
@@ -193,6 +194,8 @@ class Simulation:
     def update(self) -> None:
         self.put_in_graph()
         inter_matrix = self.matrix.copy()
+        susceptible_before = 0
+        newly_infected = 0
 
         for row in range(self.SHAPE[0]):
             for column in range(self.SHAPE[1]):
@@ -201,13 +204,23 @@ class Simulation:
                 person = self.matrix[row,column]
 
                 if person is not None:
+                    if person.status == "susceptible":
+                        susceptible_before += 1
                     new_type = person.calculate_change(near_cell, self.diseaseConstants["mortality"])
+
+                    if person.status == "susceptible" and new_type in ("carrier", "infected"):
+                        newly_infected += 1
 
                     if new_type != person.status:
                         if new_type is not None:
                             inter_matrix[row,column] = Person(new_type)
                         else:
                             inter_matrix[row,column] = None
+        self.infection_rate = (
+            round(newly_infected / susceptible_before * 100, 2)
+            if susceptible_before
+            else 0.0
+        )
         self.matrix = inter_matrix
         self.info()
         return
@@ -449,12 +462,7 @@ class Simulation:
         mortality_rate_rect = mortality_rate.get_rect(topleft=(grid_right + 20, 390))
         self.screen.blit(mortality_rate, mortality_rate_rect)
 
-        if rec + death == 0:
-            s_rate = 100.0
-        else: 
-            s_rate = round(((rec/(rec+death)))*100,2)
-        
-        survival_rate = text_init.render(f"Survival Rate (SR): {s_rate} %", True, (255,255,255))
-        survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 450))
-        self.screen.blit(survival_rate, survival_rate_rect)
+        infection_rate = text_init.render(f"Infection Rate (IR): {self.infection_rate} %", True, (255,255,255))
+        infection_rate_rect = infection_rate.get_rect(topleft=(grid_right + 20, 420))
+        self.screen.blit(infection_rate, infection_rate_rect)
         return
