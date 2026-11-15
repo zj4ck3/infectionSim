@@ -256,14 +256,51 @@ class Simulation:
         return 
 
     def make_graph(self) -> None:
-        # susceptible, carrier, infected, recovered, dead, immune, gen
+        series = [
+            ("susceptible", 0, "blue"),
+            ("carrier", 1, "yellow"),
+            ("infected", 2, "red"),
+            ("recovered", 3, "purple"),
+            ("dead", 4, "brown"),
+            ("immune", 5, "green"),
+        ]
         plt.figure(figsize=(12, 8))
-        plt.plot(self.graph[6], self.graph[0], color="blue", label="susceptible", lw=2.5)
-        plt.plot(self.graph[6], self.graph[1], color="yellow", label="carrier", lw=2.5)
-        plt.plot(self.graph[6], self.graph[2], color="red", label="infected", lw=2.5)
-        plt.plot(self.graph[6], self.graph[3], color="purple", label="recovered", lw=2.5)
-        plt.plot(self.graph[6], self.graph[4], color="brown", label="dead", lw=2.5)
-        plt.plot(self.graph[6], self.graph[5], color="green", label="immune", lw=2.5)
+        for label, graph_index, color in series:
+            values = self.graph[graph_index]
+            generations = self.graph[6]
+            plt.plot(generations, values, color=color, label=label, lw=2.5)
+
+            if not values:
+                continue
+
+            min_index = values.index(min(values))
+            max_index = values.index(max(values))
+            extrema = [(min_index, "min"), (max_index, "max")]
+            if min_index == max_index:
+                extrema = [(min_index, "min/max")]
+
+            for index, name in extrema:
+                generation = generations[index]
+                value = values[index]
+                plt.scatter(
+                    generation,
+                    value,
+                    color="white",
+                    edgecolors=color,
+                    linewidths=1.5,
+                    s=55,
+                    zorder=4,
+                )
+                plt.annotate(
+                    f"{name}: {value}",
+                    (generation, value),
+                    xytext=(5, 8 if name == "max" else -14),
+                    textcoords="offset points",
+                    color=color,
+                    fontsize=8,
+                    fontweight="bold",
+                    bbox={"boxstyle": "round,pad=0.15", "fc": "white", "ec": color, "alpha": 0.85},
+                )
 
         plt.title("Trend of type of people:")
         plt.xlabel("Generation")

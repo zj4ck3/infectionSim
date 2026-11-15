@@ -38,7 +38,7 @@ The initial percentages of healthy, carrier, infected, and vaccinated individual
 
 ### Simulation results
 
-When the simulation is terminated using `ESC`, a graph displaying the trends of the different population categories is generated using **Matplotlib**.
+When the simulation is terminated using `ESC`, a graph displaying the trends of the different population categories is generated using **Matplotlib**. Each category's minimum and maximum values are highlighted and labeled on its line.
 
 The graph supports interactive inspection, including **zooming in and out**, and can be **saved as an image file** using Matplotlib's toolbar.
 
