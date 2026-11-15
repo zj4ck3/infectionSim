@@ -63,6 +63,7 @@ class Simulation:
     def init__grid(self) -> None: # initialize the grid with people based on the density and proportions
         # Total population based on density
         population = round(self.SHAPE[0] * self.SHAPE[1] * self.diseaseConstants["density"])
+        self.starting_population = population 
         statuses = ["susceptible", "immune", "carrier", "infected"]
         proportions = [self.diseaseConstants[s] for s in statuses]
 
@@ -465,4 +466,13 @@ class Simulation:
         infection_rate = text_init.render(f"Infection Rate (IR): {self.infection_rate} %", True, (255,255,255))
         infection_rate_rect = infection_rate.get_rect(topleft=(grid_right + 20, 420))
         self.screen.blit(infection_rate, infection_rate_rect)
+
+        self.survival_rate = (
+                    round( population / self.starting_population * 100, 2)
+                    if self.starting_population
+                    else 0
+                )
+        survival_rate = text_init.render(f"Survival Rate (SR): {self.survival_rate} %", True, (255,255,255))
+        survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 450))
+        self.screen.blit(survival_rate, survival_rate_rect)
         return
