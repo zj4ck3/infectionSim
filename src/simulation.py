@@ -226,90 +226,6 @@ class Simulation:
         self.info()
         return
 
-    def put_in_graph(self) -> None: # put in a matrix the various counts
-        susceptible, carrier, infected = 0, 0, 0
-        dead, recovered, immune = 0, 0, 0
-
-        for i in range(self.WIDTH):
-            for j in range(self.HEIGHT):
-                if self.matrix[i,j] is not None:
-                    if self.matrix[i,j].status == "susceptible":
-                        susceptible += 1
-                    elif self.matrix[i,j].status == "carrier":
-                        carrier += 1
-                    elif self.matrix[i,j].status == "infected":
-                        infected += 1
-                    elif self.matrix[i,j].status == "dead":
-                        dead += 1
-                    elif self.matrix[i,j].status == "recovered":
-                        recovered += 1
-                    elif self.matrix[i,j].status == "immune":
-                        immune += 1
-
-        self.graph[0].append(susceptible)
-        self.graph[1].append(carrier)
-        self.graph[2].append(infected)
-        self.graph[3].append(recovered)
-        self.graph[4].append(dead)
-        self.graph[5].append(immune)
-        self.graph[6].append(self.GEN)
-        return 
-
-    def make_graph(self) -> None:
-        series = [
-            ("susceptible", 0, "blue"),
-            ("carrier", 1, "yellow"),
-            ("infected", 2, "red"),
-            ("recovered", 3, "purple"),
-            ("dead", 4, "brown"),
-            ("immune", 5, "green"),
-        ]
-        plt.figure(figsize=(12, 8))
-        for label, graph_index, color in series:
-            values = self.graph[graph_index]
-            generations = self.graph[6]
-            plt.plot(generations, values, color=color, label=label, lw=2.5)
-
-            if not values:
-                continue
-
-            min_index = values.index(min(values))
-            max_index = values.index(max(values))
-            extrema = [(min_index, "min"), (max_index, "max")]
-            if min_index == max_index:
-                extrema = [(min_index, "min/max")]
-
-            for index, name in extrema:
-                generation = generations[index]
-                value = values[index]
-                plt.scatter(
-                    generation,
-                    value,
-                    color="white",
-                    edgecolors=color,
-                    linewidths=1.5,
-                    s=55,
-                    zorder=4,
-                )
-                plt.annotate(
-                    f"{name}: {value}",
-                    (generation, value),
-                    xytext=(5, 8 if name == "max" else -14),
-                    textcoords="offset points",
-                    color=color,
-                    fontsize=8,
-                    fontweight="bold",
-                    bbox={"boxstyle": "round,pad=0.15", "fc": "white", "ec": color, "alpha": 0.85},
-                )
-
-        plt.title("Trend of type of people:")
-        plt.xlabel("Generation")
-        plt.ylabel("N. type of person")
-        plt.legend(loc="upper right", bbox_to_anchor=(0.85, 0.95))
-        plt.grid(True)
-        plt.show()
-        return
-
     def run(self) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode(self.WINDOW_SIZE, pygame.RESIZABLE)
@@ -413,6 +329,113 @@ class Simulation:
         pygame.quit()
         return
 
+    def put_in_graph(self) -> None: # put in a matrix the various counts
+        susceptible, carrier, infected = 0, 0, 0
+        dead, recovered, immune = 0, 0, 0
+
+        for i in range(self.WIDTH):
+            for j in range(self.HEIGHT):
+                if self.matrix[i,j] is not None:
+                    if self.matrix[i,j].status == "susceptible":
+                        susceptible += 1
+                    elif self.matrix[i,j].status == "carrier":
+                        carrier += 1
+                    elif self.matrix[i,j].status == "infected":
+                        infected += 1
+                    elif self.matrix[i,j].status == "dead":
+                        dead += 1
+                    elif self.matrix[i,j].status == "recovered":
+                        recovered += 1
+                    elif self.matrix[i,j].status == "immune":
+                        immune += 1
+
+        self.graph[0].append(susceptible)
+        self.graph[1].append(carrier)
+        self.graph[2].append(infected)
+        self.graph[3].append(recovered)
+        self.graph[4].append(dead)
+        self.graph[5].append(immune)
+        self.graph[6].append(self.GEN)
+        return 
+
+    def make_graph(self) -> None:
+        series = [
+            ("susceptible", 0, "blue"),
+            ("carrier", 1, "yellow"),
+            ("infected", 2, "red"),
+            ("recovered", 3, "purple"),
+            ("dead", 4, "brown"),
+            ("immune", 5, "green"),
+        ]
+        plt.figure(figsize=(12, 8))
+        for label, graph_index, color in series:
+            values = self.graph[graph_index]
+            generations = self.graph[6]
+            plt.plot(generations, values, color=color, label=label, lw=2.5)
+
+            if not values:
+                continue
+
+            min_index = values.index(min(values))
+            max_index = values.index(max(values))
+            extrema = [(min_index, "min"), (max_index, "max")]
+            if min_index == max_index:
+                extrema = [(min_index, "min/max")]
+
+            for index, name in extrema:
+                generation = generations[index]
+                value = values[index]
+                plt.scatter(
+                    generation,
+                    value,
+                    color="white",
+                    edgecolors=color,
+                    linewidths=1.5,
+                    s=55,
+                    zorder=4,
+                )
+                plt.annotate(
+                    f"{name}: {value}",
+                    (generation, value),
+                    xytext=(5, 8 if name == "max" else -14),
+                    textcoords="offset points",
+                    color=color,
+                    fontsize=8,
+                    fontweight="bold",
+                    bbox={"boxstyle": "round,pad=0.15", "fc": "white", "ec": color, "alpha": 0.85},
+                )
+
+        plt.title("Trend of type of people:")
+        plt.xlabel("Generation")
+        plt.ylabel("N. type of person")
+        plt.legend(loc="upper right", bbox_to_anchor=(0.85, 0.95))
+        plt.grid(True)
+        plt.show()
+        return
+
+    def basic_stat(self, type) -> list: # return max, min and average
+        # susceptible, carrier, infected, recovered, dead, immune
+        data = []
+        if type == "susceptible":
+            data = self.graph[0]
+        elif type == "carrier":
+            data = self.graph[1]
+        elif type == "infected":
+            data = self.graph[2]
+        elif type == "recovered":
+            data = self.graph[3]
+        elif type == "dead":
+            data = self.graph[4]
+        elif type == "immune":
+            data = self.graph[5]
+
+        if len(data) == 0:
+            return [0, 0, 0]
+        elif len(data) == 1:
+            return [data[0], data[0], data[0]]
+        else:
+            return [max(data), min(data), round(sum(data)/len(data), 2) if len(data) > 0 else 0]
+
     def info(self) -> None: # display information
         text_init = pygame.font.SysFont(None, 36)
         screen_width, screen_height = self.screen.get_size()
@@ -476,32 +499,62 @@ class Simulation:
         susc_pop_rect = susc_pop.get_rect(topleft=(grid_right + 20, 210))
         self.screen.blit(susc_pop, susc_pop_rect)
 
+        susc_stats = self.basic_stat("susceptible")
+        susc_stats_text = text_init.render(f"Max: {susc_stats[0]} - Min: {susc_stats[1]} - Avg: {susc_stats[2]}", True, (255,255,255))
+        susc_stats_rect = susc_stats_text.get_rect(topleft=(grid_right + 20, 240))
+        self.screen.blit(susc_stats_text, susc_stats_rect)
+
         imm_pop = text_init.render(f"Immune: {round((imm/N_cell)*100,2)} % - {imm}", True, (255,255,255))
-        imm_pop_rect = imm_pop.get_rect(topleft=(grid_right + 20, 240))
+        imm_pop_rect = imm_pop.get_rect(topleft=(grid_right + 20, 270))
         self.screen.blit(imm_pop, imm_pop_rect)
 
+        imm_stats = self.basic_stat("immune")
+        imm_stats_text = text_init.render(f"Max: {imm_stats[0]} - Min: {imm_stats[1]} - Avg: {imm_stats[2]}", True, (255,255,255))
+        imm_stats_rect = imm_stats_text.get_rect(topleft=(grid_right + 20, 300))
+        self.screen.blit(imm_stats_text, imm_stats_rect)
+
         carr_pop = text_init.render(f"Carrier: {round((carr/N_cell)*100,2)} % - {carr}", True, (255,255,255))
-        carr_pop_rect = carr_pop.get_rect(topleft=(grid_right + 20, 270))
+        carr_pop_rect = carr_pop.get_rect(topleft=(grid_right + 20, 330))
         self.screen.blit(carr_pop, carr_pop_rect)
 
+        carr_stats = self.basic_stat("carrier")
+        carr_stats_text = text_init.render(f"Max: {carr_stats[0]} - Min: {carr_stats[1]} - Avg: {carr_stats[2]}", True, (255,255,255))
+        carr_stats_rect = carr_stats_text.get_rect(topleft=(grid_right + 20, 360))
+        self.screen.blit(carr_stats_text, carr_stats_rect)
+
         inf_pop = text_init.render(f"Infected: {round((inf/N_cell)*100,2)} % - {inf}", True, (255,255,255))
-        inf_pop_rect = inf_pop.get_rect(topleft=(grid_right + 20, 300))
+        inf_pop_rect = inf_pop.get_rect(topleft=(grid_right + 20, 390))
         self.screen.blit(inf_pop, inf_pop_rect)
 
+        inf_stats = self.basic_stat("infected")
+        inf_stats_text = text_init.render(f"Max: {inf_stats[0]} - Min: {inf_stats[1]} - Avg: {inf_stats[2]}", True, (255,255,255))
+        inf_stats_rect = inf_stats_text.get_rect(topleft=(grid_right + 20, 420))
+        self.screen.blit(inf_stats_text, inf_stats_rect)
+
         rec_pop = text_init.render(f"Recovered: {round((rec/N_cell)*100,2)} % - {rec}", True, (255,255,255))
-        rec_pop_rect = rec_pop.get_rect(topleft=(grid_right + 20, 330))
+        rec_pop_rect = rec_pop.get_rect(topleft=(grid_right + 20, 450))
         self.screen.blit(rec_pop, rec_pop_rect)
 
+        rec_stats = self.basic_stat("recovered")
+        rec_stats_text = text_init.render(f"Max: {rec_stats[0]} - Min: {rec_stats[1]} - Avg: {rec_stats[2]}", True, (255,255,255))
+        rec_stats_rect = rec_stats_text.get_rect(topleft=(grid_right + 20, 480))
+        self.screen.blit(rec_stats_text, rec_stats_rect)
+
         death_pop = text_init.render(f"Deaths: {round((death/N_cell)*100,2)} % - {death}", True, (255,255,255))
-        death_pop_rect = death_pop.get_rect(topleft=(grid_right + 20, 360))
+        death_pop_rect = death_pop.get_rect(topleft=(grid_right + 20, 510))
         self.screen.blit(death_pop, death_pop_rect)
 
+        death_stats = self.basic_stat("dead")
+        death_stats_text = text_init.render(f"Max: {death_stats[0]} - Min: {death_stats[1]} - Avg: {death_stats[2]}", True, (255,255,255))
+        death_stats_rect = death_stats_text.get_rect(topleft=(grid_right + 20, 540))
+        self.screen.blit(death_stats_text, death_stats_rect)
+
         mortality_rate = text_init.render(f"Mortality: {round(self.diseaseConstants['mortality']*100,2)} %", True, (255,255,255))
-        mortality_rate_rect = mortality_rate.get_rect(topleft=(grid_right + 20, 390))
+        mortality_rate_rect = mortality_rate.get_rect(topleft=(grid_right + 20, 570))
         self.screen.blit(mortality_rate, mortality_rate_rect)
 
         infection_rate = text_init.render(f"Infection Rate (IR): {self.infection_rate} %", True, (255,255,255))
-        infection_rate_rect = infection_rate.get_rect(topleft=(grid_right + 20, 420))
+        infection_rate_rect = infection_rate.get_rect(topleft=(grid_right + 20, 600))
         self.screen.blit(infection_rate, infection_rate_rect)
 
         self.survival_rate = (
@@ -510,6 +563,6 @@ class Simulation:
                     else 0
                 )
         survival_rate = text_init.render(f"Survival Rate (SR): {self.survival_rate} %", True, (255,255,255))
-        survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 450))
+        survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 630))
         self.screen.blit(survival_rate, survival_rate_rect)
         return
