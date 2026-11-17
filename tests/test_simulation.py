@@ -1,5 +1,6 @@
 import pytest
 from simulation import Simulation
+from person import Person
 
 @pytest.fixture
 def simulation():

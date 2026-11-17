@@ -16,6 +16,10 @@ class Simulation:
         self.GEN = 0
         self.graph = [[],[],[],[],[],[], []] # susceptible, carrier, infected, recovered, dead, immune, gen
         self.infection_rate = 0.0
+        self.epidemic_duration = 0
+        self.epidemic_durations = []
+        self.epidemic_active = False
+        self._epidemic_last_generation = None
 
         # windows and screen variables
         self.paused = False
@@ -356,6 +360,17 @@ class Simulation:
         self.graph[4].append(dead)
         self.graph[5].append(immune)
         self.graph[6].append(self.GEN)
+
+        if self._epidemic_last_generation != self.GEN:
+            if carrier + infected:
+                if not self.epidemic_active:
+                    self.epidemic_duration = 0
+                    self.epidemic_active = True
+                self.epidemic_duration += 1
+            elif self.epidemic_active:
+                self.epidemic_active = False
+                self.epidemic_durations.append(self.epidemic_duration)
+            self._epidemic_last_generation = self.GEN
         return 
 
     def make_graph(self) -> None:
@@ -428,6 +443,8 @@ class Simulation:
             data = self.graph[4]
         elif type == "immune":
             data = self.graph[5]
+        elif type == "epidemic duration":
+            data = self.epidemic_durations
 
         if len(data) == 0:
             return [0, 0, 0]
@@ -565,4 +582,13 @@ class Simulation:
         survival_rate = text_init.render(f"Survival Rate (SR): {self.survival_rate} %", True, (255,255,255))
         survival_rate_rect = survival_rate.get_rect(topleft=(grid_right + 20, 630))
         self.screen.blit(survival_rate, survival_rate_rect)
+
+        epidemic_duration = text_init.render(f"Epidemic Duration: {self.epidemic_duration} gen", True,(255,255,255))
+        epidemic_duration_rect = epidemic_duration.get_rect(topleft=(grid_right + 20, 660))
+        self.screen.blit(epidemic_duration, epidemic_duration_rect)
+
+        epidemic_stats = self.basic_stat("epidemic duration")
+        epidemic_stats_text = text_init.render(f"Max: {epidemic_stats[0]} - Min: {epidemic_stats[1]} - Avg: {epidemic_stats[2]}",True,(255,255,255))
+        epidemic_stats_rect = epidemic_stats_text.get_rect(topleft=(grid_right + 20, 690))
+        self.screen.blit(epidemic_stats_text, epidemic_stats_rect)
         return
